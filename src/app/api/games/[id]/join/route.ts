@@ -15,7 +15,7 @@ export async function POST(
     return NextResponse.json({ error: "Name is required" }, { status: 400 });
   }
 
-  const result = joinGame(id, name.slice(0, 40), isSpectator);
+  const result = await joinGame(id, name.slice(0, 40), isSpectator);
   if (!result) {
     return NextResponse.json({ error: "Game not found" }, { status: 404 });
   }

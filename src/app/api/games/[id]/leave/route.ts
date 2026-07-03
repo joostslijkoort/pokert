@@ -17,7 +17,7 @@ export async function POST(
     );
   }
 
-  const game = removeParticipant(id, participantId);
+  const game = await removeParticipant(id, participantId);
   if (!game) {
     return NextResponse.json({ error: "Game not found" }, { status: 404 });
   }

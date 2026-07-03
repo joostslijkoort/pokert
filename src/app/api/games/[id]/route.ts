@@ -7,9 +7,9 @@ export async function GET(
 ) {
   const { id } = await params;
   const participantId = req.nextUrl.searchParams.get("participantId");
-  if (participantId) touchParticipant(id, participantId);
-
-  const game = getGame(id);
+  const game = participantId
+    ? await touchParticipant(id, participantId)
+    : await getGame(id);
 
   if (!game) {
     return NextResponse.json({ error: "Game not found" }, { status: 404 });

@@ -16,7 +16,7 @@ export async function POST(
     return NextResponse.json({ error: "Invalid vote" }, { status: 400 });
   }
 
-  const game = castVote(id, participantId, vote);
+  const game = await castVote(id, participantId, vote);
   if (!game) {
     return NextResponse.json({ error: "Game not found" }, { status: 404 });
   }

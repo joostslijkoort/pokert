@@ -9,6 +9,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Game name is required" }, { status: 400 });
   }
 
-  const game = createGame(name.slice(0, 80));
+  const game = await createGame(name.slice(0, 80));
   return NextResponse.json({ gameId: game.id });
 }

@@ -6,7 +6,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const game = resetRound(id);
+  const game = await resetRound(id);
   if (!game) {
     return NextResponse.json({ error: "Game not found" }, { status: 404 });
   }

@@ -1,21 +1,21 @@
+import { Redis } from "@upstash/redis";
 import { nanoid } from "nanoid";
 import type { CardValue, Game, PublicGame } from "./types";
 
 const STALE_PARTICIPANT_MS = 5 * 60 * 1000;
+const GAME_TTL_SECONDS = 6 * 60 * 60;
 
-type Store = {
-  games: Map<string, Game>;
-};
+const redis = Redis.fromEnv();
 
-const globalForStore = globalThis as unknown as { pokertStore?: Store };
+function gameKey(gameId: string) {
+  return `game:${gameId}`;
+}
 
-const store: Store =
-  globalForStore.pokertStore ??
-  (globalForStore.pokertStore = {
-    games: new Map(),
-  });
+async function writeGame(game: Game): Promise<void> {
+  await redis.set(gameKey(game.id), game, { ex: GAME_TTL_SECONDS });
+}
 
-export function createGame(name: string): Game {
+export async function createGame(name: string): Promise<Game> {
   const game: Game = {
     id: nanoid(10),
     name,
@@ -23,24 +23,29 @@ export function createGame(name: string): Game {
     revealed: false,
     participants: [],
   };
-  store.games.set(game.id, game);
+  await writeGame(game);
   return game;
 }
 
-export function getGame(gameId: string): Game | undefined {
-  const game = store.games.get(gameId);
+export async function getGame(gameId: string): Promise<Game | undefined> {
+  const game = await redis.get<Game>(gameKey(gameId));
   if (!game) return undefined;
+
   const cutoff = Date.now() - STALE_PARTICIPANT_MS;
-  game.participants = game.participants.filter((p) => p.lastSeen >= cutoff);
+  const activeParticipants = game.participants.filter((p) => p.lastSeen >= cutoff);
+  if (activeParticipants.length !== game.participants.length) {
+    game.participants = activeParticipants;
+    await writeGame(game);
+  }
   return game;
 }
 
-export function joinGame(
+export async function joinGame(
   gameId: string,
   name: string,
   isSpectator: boolean
-): { game: Game; participantId: string } | undefined {
-  const game = getGame(gameId);
+): Promise<{ game: Game; participantId: string } | undefined> {
+  const game = await getGame(gameId);
   if (!game) return undefined;
 
   const participantId = nanoid(10);
@@ -51,51 +56,64 @@ export function joinGame(
     vote: null,
     lastSeen: Date.now(),
   });
+  await writeGame(game);
   return { game, participantId };
 }
 
-export function touchParticipant(gameId: string, participantId: string) {
-  const game = getGame(gameId);
-  const participant = game?.participants.find((p) => p.id === participantId);
-  if (participant) participant.lastSeen = Date.now();
+export async function touchParticipant(
+  gameId: string,
+  participantId: string
+): Promise<Game | undefined> {
+  const game = await getGame(gameId);
+  if (!game) return undefined;
+  const participant = game.participants.find((p) => p.id === participantId);
+  if (participant) {
+    participant.lastSeen = Date.now();
+    await writeGame(game);
+  }
+  return game;
 }
 
-export function castVote(
+export async function castVote(
   gameId: string,
   participantId: string,
   vote: CardValue
-): Game | undefined {
-  const game = getGame(gameId);
+): Promise<Game | undefined> {
+  const game = await getGame(gameId);
   if (!game) return undefined;
   const participant = game.participants.find((p) => p.id === participantId);
   if (!participant || participant.isSpectator) return game;
   participant.vote = vote;
   participant.lastSeen = Date.now();
+  await writeGame(game);
   return game;
 }
 
-export function revealVotes(gameId: string): Game | undefined {
-  const game = getGame(gameId);
+export async function revealVotes(gameId: string): Promise<Game | undefined> {
+  const game = await getGame(gameId);
   if (!game) return undefined;
   game.revealed = true;
+  await writeGame(game);
   return game;
 }
 
-export function resetRound(gameId: string): Game | undefined {
-  const game = getGame(gameId);
+export async function resetRound(gameId: string): Promise<Game | undefined> {
+  const game = await getGame(gameId);
   if (!game) return undefined;
   game.revealed = false;
   game.participants.forEach((p) => (p.vote = null));
+  await writeGame(game);
   return game;
 }
 
-export function removeParticipant(
+export async function removeParticipant(
   gameId: string,
   participantId: string
-): Game | undefined {
-  const game = getGame(gameId);
+): Promise<Game | undefined> {
+  const game = await getGame(gameId);
   if (!game) return undefined;
   game.participants = game.participants.filter((p) => p.id !== participantId);
+  await writeGame(game);
   return game;
 }
 
