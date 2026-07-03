@@ -88,7 +88,7 @@ export default function GameRoom({
         </button>
       </header>
 
-      <section className="flex w-full max-w-2xl flex-col items-center gap-4 rounded-xl border border-zinc-200 bg-white/80 p-6 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/70">
+      <section className="flex w-full max-w-2xl flex-col items-center gap-4 rounded-xl border border-zinc-200 bg-white/80 p-6 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/40">
         {game.revealed ? (
           <div className="text-center">
             <p className="text-xs font-medium uppercase tracking-wide text-zinc-400">
