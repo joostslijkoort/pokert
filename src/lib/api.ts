@@ -71,3 +71,13 @@ export function resetRound(gameId: string) {
     method: "POST",
   });
 }
+
+// keepalive lets this survive being fired from a page-unload handler
+export function leaveGame(gameId: string, participantId: string) {
+  fetch(`/api/games/${gameId}/leave`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ participantId }),
+    keepalive: true,
+  }).catch(() => {});
+}

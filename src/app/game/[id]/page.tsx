@@ -2,7 +2,12 @@
 
 import { use, useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { ApiError, fetchGame, joinGame as joinGameApi } from "@/lib/api";
+import {
+  ApiError,
+  fetchGame,
+  joinGame as joinGameApi,
+  leaveGame,
+} from "@/lib/api";
 import type { PublicGame } from "@/lib/types";
 import JoinForm from "@/components/game/JoinForm";
 import GameRoom from "@/components/game/GameRoom";
@@ -62,6 +67,29 @@ export default function GamePage({
     const interval = setInterval(refresh, POLL_INTERVAL_MS);
     return () => clearInterval(interval);
   }, [gameId, refresh]);
+
+  useEffect(() => {
+    if (!participantId) return;
+    const id = participantId;
+
+    function handlePageHide(event: PageTransitionEvent) {
+      if (event.persisted) return; // page may be restored from bfcache
+      leaveGame(gameId, id);
+    }
+    function handleBeforeUnload(event: BeforeUnloadEvent) {
+      // Triggers the browser's native "leave site?" confirmation. If the
+      // user confirms, the actual leave is sent from the pagehide handler.
+      event.preventDefault();
+      event.returnValue = "";
+    }
+
+    window.addEventListener("pagehide", handlePageHide);
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      window.removeEventListener("pagehide", handlePageHide);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [gameId, participantId]);
 
   async function handleJoin(name: string, isSpectator: boolean) {
     const { participantId: newId, game: updated } = await joinGameApi(
