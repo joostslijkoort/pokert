@@ -67,7 +67,7 @@ export default function Home() {
           <button
             type="submit"
             disabled={loading || !name.trim()}
-            className="mt-4 w-full rounded-lg bg-indigo-600 px-4 py-2 font-medium text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+            className="mt-4 w-full rounded-lg bg-indigo-600 cursor-pointer px-4 py-2 font-medium text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {loading ? "Creating..." : "Create game"}
           </button>

@@ -101,7 +101,7 @@ export function removeParticipant(
 
 export function toPublicGame(game: Game): PublicGame {
   const numericVotes = game.participants
-    .filter((p) => !p.isSpectator && p.vote !== null && p.vote !== "?")
+    .filter((p) => !p.isSpectator && p.vote !== null && !Number.isNaN(Number(p.vote)))
     .map((p) => Number(p.vote));
 
   const average =

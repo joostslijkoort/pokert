@@ -11,6 +11,7 @@ export const FIBONACCI_CARDS = [
   "55",
   "89",
   "?",
+  "☕",
 ] as const;
 
 export type CardValue = (typeof FIBONACCI_CARDS)[number];

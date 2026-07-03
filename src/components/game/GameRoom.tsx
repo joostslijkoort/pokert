@@ -6,6 +6,12 @@ import { FIBONACCI_CARDS, type CardValue, type PublicGame } from "@/lib/types";
 import Card from "./Card";
 import ParticipantList from "./ParticipantList";
 
+const CARD_ROW_SPLIT = Math.ceil(FIBONACCI_CARDS.length / 2);
+const CARD_ROWS = [
+  FIBONACCI_CARDS.slice(0, CARD_ROW_SPLIT),
+  FIBONACCI_CARDS.slice(CARD_ROW_SPLIT),
+];
+
 type Props = {
   game: PublicGame;
   participantId: string;
@@ -76,7 +82,7 @@ export default function GameRoom({
         <button
           type="button"
           onClick={handleCopyLink}
-          className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-medium text-zinc-600 transition hover:border-indigo-400 hover:text-indigo-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300"
+          className="mt-2 inline-flex items-center cursor-pointer gap-1.5 rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-medium text-zinc-600 transition hover:border-indigo-400 hover:text-indigo-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300"
         >
           {copied ? "Link copied!" : "Copy invite link"}
         </button>
@@ -113,7 +119,7 @@ export default function GameRoom({
               type="button"
               onClick={handleReset}
               disabled={pending}
-              className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-500 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
             >
               New round
             </button>
@@ -128,19 +134,23 @@ export default function GameRoom({
       />
 
       {!isSpectator && (
-        <section className="w-full max-w-2xl">
+        <section className="w-full max-w-5xl">
           <p className="mb-3 text-center text-xs font-medium uppercase tracking-wide text-zinc-400">
             Pick your card
           </p>
-          <div className="flex flex-wrap justify-center gap-3">
-            {FIBONACCI_CARDS.map((value) => (
-              <Card
-                key={value}
-                value={value}
-                selected={myVote === value}
-                disabled={pending || game.revealed}
-                onClick={() => handleVote(value)}
-              />
+          <div className="flex flex-col items-center gap-2 pt-1 sm:gap-3">
+            {CARD_ROWS.map((row, i) => (
+              <div key={i} className="flex flex-wrap justify-center gap-1.5 sm:gap-3">
+                {row.map((value) => (
+                  <Card
+                    key={value}
+                    value={value}
+                    selected={myVote === value}
+                    disabled={pending || game.revealed}
+                    onClick={() => handleVote(value)}
+                  />
+                ))}
+              </div>
             ))}
           </div>
         </section>
