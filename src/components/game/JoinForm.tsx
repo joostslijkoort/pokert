@@ -2,25 +2,33 @@
 
 import { useState } from "react";
 
+const DISPLAY_NAME_KEY = "pokert:displayName";
+
 type Props = {
   gameName: string;
   onJoin: (name: string, isSpectator: boolean) => Promise<void>;
 };
 
 export default function JoinForm({ gameName, onJoin }: Props) {
-  const [name, setName] = useState("");
+  const [name, setName] = useState(() =>
+    typeof window === "undefined"
+      ? ""
+      : (window.localStorage.getItem(DISPLAY_NAME_KEY) ?? "")
+  );
   const [isSpectator, setIsSpectator] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!name.trim()) return;
+    const trimmedName = name.trim();
+    if (!trimmedName) return;
 
     setLoading(true);
     setError(null);
     try {
-      await onJoin(name.trim(), isSpectator);
+      await onJoin(trimmedName, isSpectator);
+      window.localStorage.setItem(DISPLAY_NAME_KEY, trimmedName);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to join game");
       setLoading(false);
