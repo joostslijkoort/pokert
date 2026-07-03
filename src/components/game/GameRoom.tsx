@@ -74,7 +74,7 @@ export default function GameRoom({
   const votedCount = voters.filter((p) => p.hasVoted).length;
 
   return (
-    <main className="flex flex-1 flex-col items-center gap-8 bg-zinc-50 px-4 py-10 dark:bg-black">
+    <main className="flex flex-1 flex-col items-center gap-8 px-4 py-10">
       <header className="w-full max-w-2xl text-center">
         <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
           {game.name}
@@ -82,13 +82,13 @@ export default function GameRoom({
         <button
           type="button"
           onClick={handleCopyLink}
-          className="mt-2 inline-flex items-center cursor-pointer gap-1.5 rounded-full border border-zinc-200 bg-white px-3 py-1 text-xs font-medium text-zinc-600 transition hover:border-indigo-400 hover:text-indigo-600 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300"
+          className="mt-2 inline-flex cursor-pointer items-center gap-1.5 rounded-full border border-zinc-200 bg-white/80 px-3 py-1 text-xs font-medium text-zinc-600 backdrop-blur-sm transition hover:border-indigo-400 hover:text-indigo-600 dark:border-zinc-800 dark:bg-zinc-900/70 dark:text-zinc-300"
         >
           {copied ? "Link copied!" : "Copy invite link"}
         </button>
       </header>
 
-      <section className="flex w-full max-w-2xl flex-col items-center gap-4 rounded-xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900">
+      <section className="flex w-full max-w-2xl flex-col items-center gap-4 rounded-xl border border-zinc-200 bg-white/80 p-6 backdrop-blur-sm dark:border-zinc-800 dark:bg-zinc-900/70">
         {game.revealed ? (
           <div className="text-center">
             <p className="text-xs font-medium uppercase tracking-wide text-zinc-400">
@@ -110,7 +110,7 @@ export default function GameRoom({
               type="button"
               onClick={handleReveal}
               disabled={pending || votedCount === 0}
-              className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
+              className="rounded-lg bg-indigo-600 cursor-pointer px-4 py-2 text-sm font-medium text-white transition hover:bg-indigo-500 disabled:cursor-not-allowed disabled:opacity-50"
             >
               Reveal votes
             </button>

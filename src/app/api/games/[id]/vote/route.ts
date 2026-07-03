@@ -21,5 +21,5 @@ export async function POST(
     return NextResponse.json({ error: "Game not found" }, { status: 404 });
   }
 
-  return NextResponse.json(toPublicGame(game));
+  return NextResponse.json(toPublicGame(game, participantId));
 }

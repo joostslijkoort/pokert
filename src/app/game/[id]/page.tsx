@@ -71,7 +71,7 @@ export default function GamePage({
 
   if (status === "loading") {
     return (
-      <main className="flex flex-1 items-center justify-center bg-zinc-50 dark:bg-black">
+      <main className="flex flex-1 items-center justify-center">
         <p className="text-sm text-zinc-400">Loading...</p>
       </main>
     );
@@ -79,7 +79,7 @@ export default function GamePage({
 
   if (status === "not-found" || !game) {
     return (
-      <main className="flex flex-1 flex-col items-center justify-center gap-2 bg-zinc-50 px-4 text-center dark:bg-black">
+      <main className="flex flex-1 flex-col items-center justify-center gap-2 px-4 text-center">
         <p className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">
           Game not found
         </p>

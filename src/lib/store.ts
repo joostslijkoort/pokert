@@ -99,7 +99,7 @@ export function removeParticipant(
   return game;
 }
 
-export function toPublicGame(game: Game): PublicGame {
+export function toPublicGame(game: Game, viewerId?: string): PublicGame {
   const numericVotes = game.participants
     .filter((p) => !p.isSpectator && p.vote !== null && !Number.isNaN(Number(p.vote)))
     .map((p) => Number(p.vote));
@@ -122,7 +122,7 @@ export function toPublicGame(game: Game): PublicGame {
       name: p.name,
       isSpectator: p.isSpectator,
       hasVoted: p.vote !== null,
-      vote: game.revealed ? p.vote : null,
+      vote: game.revealed || p.id === viewerId ? p.vote : null,
     })),
   };
 }

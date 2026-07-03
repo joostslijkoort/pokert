@@ -22,6 +22,6 @@ export async function POST(
 
   return NextResponse.json({
     participantId: result.participantId,
-    game: toPublicGame(result.game),
+    game: toPublicGame(result.game, result.participantId),
   });
 }
