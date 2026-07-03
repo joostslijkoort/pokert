@@ -2,7 +2,7 @@
 
 import { use, useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { fetchGame, joinGame as joinGameApi } from "@/lib/api";
+import { ApiError, fetchGame, joinGame as joinGameApi } from "@/lib/api";
 import type { PublicGame } from "@/lib/types";
 import JoinForm from "@/components/game/JoinForm";
 import GameRoom from "@/components/game/GameRoom";
@@ -47,8 +47,13 @@ export default function GamePage({
       }
 
       setStatus("ready");
-    } catch {
-      setStatus("not-found");
+    } catch (err) {
+      // A 404 means the game genuinely no longer exists. Any other failure
+      // (network blip, transient server error) shouldn't kick everyone else
+      // in the room out — just skip this poll and retry on the next tick.
+      if (err instanceof ApiError && err.status === 404) {
+        setStatus("not-found");
+      }
     }
   }, [gameId]);
 

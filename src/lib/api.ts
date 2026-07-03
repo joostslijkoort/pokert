@@ -1,5 +1,14 @@
 import type { CardValue, PublicGame } from "./types";
 
+export class ApiError extends Error {
+  status: number;
+
+  constructor(message: string, status: number) {
+    super(message);
+    this.status = status;
+  }
+}
+
 async function request<T>(url: string, init?: RequestInit): Promise<T> {
   const res = await fetch(url, {
     ...init,
@@ -7,7 +16,7 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
   });
   const data = await res.json().catch(() => null);
   if (!res.ok) {
-    throw new Error(data?.error ?? "Something went wrong");
+    throw new ApiError(data?.error ?? "Something went wrong", res.status);
   }
   return data as T;
 }
